@@ -71,7 +71,9 @@ if [ $? -eq 0 ]; then
 #if file request retrieve http code 200 this means OK
 
 #get all exe english installers
-linklist=$(wget -qO- "$download" | sed "s/\d034/\n/g" | grep "Ethernet-Intel-Ethernet-Adapter-Connections" | sort | uniq | sed "s/^/https:\/\/downloadcenter\.intel\.com/g" | sed '$alast line')
+linklist=$(wget -qO- "$download" | sed "s/\d034/\n/g" | grep "Ethernet-Intel-Ethernet-Adapter-Connections" | sort | uniq | sed "s/^.*download\//https:\/\/downloadcenter\.intel\.com\/download\//g" | sed '$alast line')
+
+echo "$linklist"
 
 #count how many links are in download page. substarct one fake last line from array
 links=$(echo "$linklist" | head -n -1 | wc -l)
@@ -85,7 +87,7 @@ do {
 echo "Link:" "$link"
 
 #look for zip file
-url=$(wget -qO- "$link" | sed "s/\d034\|=/\n/g" | sed "s/%3A/:/g" | sed "s/%2F/\//g" | grep -m1 "http.*zip")
+url=$(wget -qO- "$link" | sed "s/\d034\|=/\n/g" | sed "s/%3A/:/g" | sed "s/%2F/\//g" | grep -m1 "http.*zip\|http.*ZIP")
 
 echo " URL:" "$url"
 
@@ -148,7 +150,7 @@ echo >> $db
 emails=$(cat ../posting | sed '$aend of file')
 printf %s "$emails" | while IFS= read -r onemail
 do {
-python ../send-email.py "$onemail" "$name $version $type $lang" "$url
+python ../send-email.py "$onemail" "$name $filename" "$url 
 $md5
 $sha1
 "
