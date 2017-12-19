@@ -71,13 +71,13 @@ if [ $? -eq 0 ]; then
 #if file request retrieve http code 200 this means OK
 
 #get all exe english installers
-linklist=$(wget -qO- "$download" | sed "s/\d034/\n/g" | grep "Ethernet-Intel-Ethernet-Adapter-Connections" | sort | uniq | sed "s/^.*download\//https:\/\/downloadcenter\.intel\.com\/download\//g" | sed '$alast line')
+linklist=$(wget -qO- "$download" | egrep -o "https:.*zip.>" | sed "s/zip.*$/zip/" | sed '$alast line')
 
 echo "$linklist"
 
 #count how many links are in download page. substarct one fake last line from array
 links=$(echo "$linklist" | head -n -1 | wc -l)
-if [ $links -gt 1 ]; then
+if [ $links -gt 0 ]; then
 echo $links download links found
 echo
 
@@ -87,7 +87,7 @@ do {
 echo "Link:" "$link"
 
 #look for zip file
-url=$(wget -qO- "$link" | sed "s/\d034\|=/\n/g" | sed "s/%3A/:/g" | sed "s/%2F/\//g" | grep -m1 "http.*zip\|http.*ZIP")
+url=$link
 
 echo " URL:" "$url"
 
